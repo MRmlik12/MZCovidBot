@@ -1,12 +1,8 @@
-﻿using System;
-
-namespace MZCovidBot
+﻿namespace MZCovidBot
 {
     class Program
     {
         static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
-        }
+            => new Bot().Run().GetAwaiter().GetResult();
     }
 }
