@@ -21,6 +21,5 @@ namespace MZCovidBot.Stats.Api.Models
         public string Country { get; set; }
         public Uri SourceUrl { get; set; }
         public Uri HistoryData { get; set; }
-        public Uri ReadMe { get; set; }
     }
 }

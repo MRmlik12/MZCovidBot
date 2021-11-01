@@ -1,0 +1,29 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:13.4-alpine
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: MZCovidBot
+      POSTGRES_USER: mzcovid
+      POSTGRES_PASSWORD: 1234
+    volumes:
+      - mz-covid-bot-db:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4:6.0
+    ports:
+      - '88:10000'
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=example@example.com
+      - PGADMIN_DEFAULT_PASSWORD=test
+  redis:
+    image: redis:6.2.6-alpine
+    restart: always
+    ports:
+      - '6379:379'
+
+volumes:
+  mz-covid-bot-db:
+    external: true
