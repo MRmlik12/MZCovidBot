@@ -23,7 +23,9 @@ namespace MZCovidBot.Database
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<CovidData>()
-                .HasNoKey();
+                .Property(p => p.Id)
+                .ValueGeneratedOnAdd();
+            
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
 

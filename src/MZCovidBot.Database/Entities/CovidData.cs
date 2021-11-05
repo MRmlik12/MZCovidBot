@@ -1,8 +1,11 @@
+using System.ComponentModel.DataAnnotations;
 using MZCovidBot.Stats.Api.Models;
 
 namespace MZCovidBot.Database.Entities
 {
-    public abstract class CovidData : LatestCovidStats
+    public class CovidData : LatestCovidStats
     {
+        [Key]
+        public ulong Id { get; set; }
     }
 }
