@@ -1,14 +1,14 @@
 using System;
 using System.Threading.Tasks;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using MZCovidBot.Database;
+using MZCovidBot.Database.Interfaces;
+using MZCovidBot.Database.Repositories;
+using MZCovidBot.Jobs;
 using MZCovidBot.Services;
-using Quartz;
 
 namespace MZCovidBot
 {
@@ -21,44 +21,33 @@ namespace MZCovidBot
             provider.GetRequiredService<LogService>();
             await provider.GetRequiredService<CommandHandlerService>().Initialize();
             await provider.GetRequiredService<StartupService>().Initialize();
-            await provider.GetRequiredService<IScheduler>().Start();
+            await provider.GetRequiredService<Scheduler>().Setup();
+
+            await Task.Delay(-1);
         }
 
-        private async Task<IScheduler> GetScheduler()
-            => await SchedulerBuilder.Create()
-                .UseDefaultThreadPool(x => x.MaxConcurrency = 5)
-                .UsePersistentStore(x =>
-                {
-                    x.UseProperties = true;
-                    x.UseClustering();
-                    x.UsePostgres(Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING") ?? string.Empty);
-                    x.UseJsonSerializer();
-                })
-                .BuildScheduler();
-
-        private IContainer GetAutofacContainer()
+        private IServiceProvider GetServices()
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterModule(new DatabaseModule());
-
-            return containerBuilder.Build();
+            return new ServiceCollection()
+                .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
+                {
+                    LogLevel = LogSeverity.Error,
+                    MessageCacheSize = 1000
+                }))
+                .AddSingleton(new CommandService(new CommandServiceConfig
+                {
+                    LogLevel = LogSeverity.Error
+                }))
+                .AddSingleton<StartupService>()
+                .AddSingleton<CommandHandlerService>()
+                .AddSingleton<LogService>()
+                .AddSingleton<Scheduler>()
+                .AddSingleton(new AppDbContext(Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING") ??
+                                               string.Empty))
+                .AddSingleton<IUnitOfWork, UnitOfWork>()
+                .AddSingleton<ICovidDataRepository, CovidDataRepository>()
+                .AddTransient<DownloadCovidStatJob>()
+                .BuildServiceProvider();
         }
-        
-        private IServiceProvider GetServices() => new ServiceCollection()
-            .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
-            {
-                LogLevel = LogSeverity.Error,
-                MessageCacheSize = 1000
-            }))
-            .AddSingleton(new CommandService(new CommandServiceConfig
-            {
-                LogLevel = LogSeverity.Error
-            }))
-            .AddSingleton(GetScheduler())
-            .AddSingleton<StartupService>()
-            .AddSingleton<CommandHandlerService>()
-            .AddSingleton<LogService>()
-            .AddSingleton(new AutofacServiceProvider(GetAutofacContainer()))
-            .BuildServiceProvider();
     }
 }

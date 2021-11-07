@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace MZCovidBot.Stats.Api.Models
 {
     public class LatestCovidStats
-    { 
+    {
         public long Infected { get; set; }
         public long Deceased { get; set; }
         public long Recovered { get; set; }

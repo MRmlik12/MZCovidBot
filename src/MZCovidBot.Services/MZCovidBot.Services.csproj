@@ -1,17 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Autofac" Version="6.3.0" />
-    <PackageReference Include="Discord.Net" Version="2.4.0" />
-    <PackageReference Include="Quartz" Version="3.3.3" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Discord.Net" Version="2.4.0"/>
+        <PackageReference Include="Quartz" Version="3.3.3"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MZCovidBot.Commands\MZCovidBot.Commands.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\MZCovidBot.Commands\MZCovidBot.Commands.csproj"/>
+    </ItemGroup>
 
 </Project>

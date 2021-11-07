@@ -15,7 +15,7 @@ namespace MZCovidBot.Services
         private static Task Log(LogMessage arg)
         {
             Console.WriteLine(arg.ToString());
-            
+
             return Task.CompletedTask;
         }
     }

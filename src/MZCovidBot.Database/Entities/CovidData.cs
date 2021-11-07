@@ -5,7 +5,6 @@ namespace MZCovidBot.Database.Entities
 {
     public class CovidData : LatestCovidStats
     {
-        [Key]
-        public ulong Id { get; set; }
+        [Key] public ulong Id { get; set; }
     }
 }

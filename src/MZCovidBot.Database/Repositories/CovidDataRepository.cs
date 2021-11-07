@@ -7,14 +7,16 @@ namespace MZCovidBot.Database.Repositories
 {
     public class CovidDataRepository : ICovidDataRepository
     {
-        private DbSet<CovidData> CovidData { get; }
-
         public CovidDataRepository(AppDbContext context)
         {
             CovidData = context.CovidData;
         }
 
+        private DbSet<CovidData> CovidData { get; }
+
         public async Task Create(CovidData entity)
-            => await CovidData.AddAsync(entity);
+        {
+            await CovidData.AddAsync(entity);
+        }
     }
 }

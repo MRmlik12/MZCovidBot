@@ -12,7 +12,7 @@ namespace MZCovidBot.Services
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _provider;
-        
+
         public CommandHandlerService(DiscordSocketClient client, CommandService commands, IServiceProvider provider)
         {
             _client = client;
@@ -23,9 +23,9 @@ namespace MZCovidBot.Services
         public async Task Initialize()
         {
             _client.MessageReceived += HandleCommands;
-            
-            await _commands.AddModulesAsync(assembly: Assembly.GetAssembly(typeof(MainCommands)), 
-                services: _provider);
+
+            await _commands.AddModulesAsync(Assembly.GetAssembly(typeof(MainCommands)),
+                _provider);
         }
 
         //See: https://docs.stillu.cc/guides/commands/intro.html
@@ -34,18 +34,19 @@ namespace MZCovidBot.Services
             if (arg is not SocketUserMessage message) return;
 
             var argPos = 0;
-            
-            if (!(message.HasCharPrefix(Convert.ToChar(Environment.GetEnvironmentVariable("PREFIX") ?? "$"), ref argPos) || 
+
+            if (!(message.HasCharPrefix(Convert.ToChar(Environment.GetEnvironmentVariable("PREFIX") ?? "$"),
+                      ref argPos) ||
                   message.HasMentionPrefix(_client.CurrentUser, ref argPos)) ||
                 message.Author.IsBot)
                 return;
-            
+
             var context = new SocketCommandContext(_client, message);
-            
+
             await _commands.ExecuteAsync(
-                context: context, 
-                argPos: argPos,
-                services: _provider);
+                context,
+                argPos,
+                _provider);
         }
     }
 }

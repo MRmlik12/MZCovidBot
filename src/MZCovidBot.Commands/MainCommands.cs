@@ -9,7 +9,9 @@ namespace MZCovidBot.Commands
         [Command("ping")]
         [Description("Checks bot response time!")]
         public async Task Ping()
-            => await Context.Channel.SendMessageAsync($"{Context.Message.Author.Mention} " +
-                                                      $" :ping_pong: Pong in {Context.Client.Latency.ToString()}ms!");
+        {
+            await Context.Channel.SendMessageAsync($"{Context.Message.Author.Mention} " +
+                                                   $" :ping_pong: Pong in {Context.Client.Latency.ToString()}ms!");
+        }
     }
 }

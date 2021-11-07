@@ -6,6 +6,9 @@ namespace MZCovidBot.Database
     public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     {
         public AppDbContext CreateDbContext(string[] args)
-            => new (Environment.GetEnvironmentVariable("POSTGRES_STRING") ?? "Server=localhost;Database=MZCovidBot;Uid=mzcovid;Pwd=1234;");
+        {
+            return new(Environment.GetEnvironmentVariable("POSTGRES_STRING") ??
+                       "Server=localhost;Database=MZCovidBot;Uid=mzcovid;Pwd=1234;");
+        }
     }
 }
