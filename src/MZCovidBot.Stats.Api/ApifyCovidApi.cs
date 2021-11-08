@@ -10,10 +10,12 @@ namespace MZCovidBot.Stats.Api
         private const string GetLatestUrl = "https://api.apify.com/v2/key-value-stores";
 
         public static async Task<LatestCovidStats> GetLatestCovidStats()
-            => await GetLatestUrl
+        {
+            return await GetLatestUrl
                 .AppendPathSegment("/3Po6TV7wTht4vIEid/records/LATEST")
                 .SetQueryParam("disableRedirect", "false")
                 .GetAsync()
                 .ReceiveJson<LatestCovidStats>();
+        }
     }
 }

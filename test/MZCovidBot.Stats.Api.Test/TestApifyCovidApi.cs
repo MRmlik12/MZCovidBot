@@ -11,12 +11,12 @@ namespace MZCovidBot.Stats.Api.Test
         {
             using var httpTest = new HttpTest();
             httpTest.RespondWithJson(new LatestCovidStats
-                {
-                    Country = "Poland"
-                });
-                
+            {
+                Country = "Poland"
+            });
+
             var result = await ApifyCovidApi.GetLatestCovidStats();
-                
+
             Assert.NotNull(result.Country);
         }
     }

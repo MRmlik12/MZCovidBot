@@ -1,8 +1,10 @@
 ﻿namespace MZCovidBot
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
-            => new Bot().Run().GetAwaiter().GetResult();
+        private static void Main(string[] args)
+        {
+            new Startup().Run().GetAwaiter().GetResult();
+        }
     }
 }
