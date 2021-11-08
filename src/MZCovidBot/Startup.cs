@@ -1,12 +1,13 @@
 using System;
 using System.Threading.Tasks;
+using AutoMapper;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using MZCovidBot.Database;
 using MZCovidBot.Database.Interfaces;
-using MZCovidBot.Database.Repositories;
+using MZCovidBot.Database.Repository;
 using MZCovidBot.Jobs;
 using MZCovidBot.Services;
 
@@ -42,11 +43,13 @@ namespace MZCovidBot
                 .AddSingleton<CommandHandlerService>()
                 .AddSingleton<LogService>()
                 .AddSingleton<Scheduler>()
-                .AddSingleton(new AppDbContext(Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING") ??
-                                               string.Empty))
-                .AddSingleton<IUnitOfWork, UnitOfWork>()
+                .AddSingleton<IMapper>(new Mapper(
+                        AutoMapperConfiguration.GetConfiguration()
+                    )
+                )
+                .AddSingleton<MongoDbContext>()
                 .AddSingleton<ICovidDataRepository, CovidDataRepository>()
-                .AddTransient<DownloadCovidStatJob>()
+                .AddTransient<SendCovidStatJob>()
                 .BuildServiceProvider();
         }
     }

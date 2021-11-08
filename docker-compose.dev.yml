@@ -1,23 +1,19 @@
 version: '3.9'
 services:
-  db:
-    image: postgres:13.4-alpine
+  mongo:
+    image: mongo:5.0.3
     restart: always
     ports:
-      - '5432:5432'
-    environment:
-      POSTGRES_DB: MZCovidBot
-      POSTGRES_USER: mzcovid
-      POSTGRES_PASSWORD: 1234
+      - "27017:27017"
     volumes:
-      - mz-covid-bot-db:/var/lib/postgresql/data
-  pgadmin:
-    image: dpage/pgadmin4:6.0
+      - mz-covid-bot-db:/data/db
+  mongo-express:
+    image: mongo-express:0.54.0
+    restart: always
     ports:
-      - '88:10000'
+      - "8081:8081"
     environment:
-      - PGADMIN_DEFAULT_EMAIL=example@example.com
-      - PGADMIN_DEFAULT_PASSWORD=test
+      ME_CONFIG_MONGODB_URL: mongodb://localhost:27017/
 volumes:
   mz-covid-bot-db:
     external: true

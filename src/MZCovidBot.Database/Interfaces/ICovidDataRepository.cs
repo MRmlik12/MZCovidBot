@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
-using MZCovidBot.Database.Entities;
+using MZCovidBot.Database.Models;
 
 namespace MZCovidBot.Database.Interfaces
 {
     public interface ICovidDataRepository
     {
-        Task Create(CovidData entity);
+        Task Create(CovidData covidData);
     }
 }

@@ -28,13 +28,13 @@ namespace MZCovidBot
         private async Task InitializeJobs()
         {
             _scheduler.JobFactory = new JobFactory(_services);
-            var covidJob = JobBuilder.Create<DownloadCovidStatJob>()
+            var covidJob = JobBuilder.Create<SendCovidStatJob>()
                 .WithIdentity("covid-job", "covid-group")
                 .Build();
             var covidTrigger = TriggerBuilder.Create()
                 .WithIdentity("covid-trigger", "covid-group")
                 .StartNow()
-                .WithSimpleSchedule(x => x.WithIntervalInSeconds(10).RepeatForever())
+                .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever())
                 .Build();
 
             await _scheduler.ScheduleJob(covidJob, covidTrigger);
