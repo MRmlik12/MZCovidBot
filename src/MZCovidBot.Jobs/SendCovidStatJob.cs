@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
@@ -9,11 +7,7 @@ using MZCovidBot.Database.Interfaces;
 using MZCovidBot.Database.Models;
 using MZCovidBot.Stats.Api;
 using MZCovidBot.Stats.Api.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Quartz;
-using QuickChart;
-using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace MZCovidBot.Jobs
 {
@@ -41,15 +35,15 @@ namespace MZCovidBot.Jobs
 
             if (stats.LastUpdatedAtSource <= latestStat?.LastUpdatedAtSource) return;
 
-            await SaveCovidData(stats);
+            await _covidDataRepository.Create(_mapper.Map<CovidData>(stats));
             var latestStatsFromWeek = await _covidDataRepository.GetWeekData(DateTimeOffset.Now);
-            var infectedChartUrl = GetChartUrl(latestStatsFromWeek);
-            
+            var infectedChartUrl = GenerateChart.GetGeneratedChartUrl(latestStatsFromWeek);
+
             var channel =
                 (IMessageChannel)_discordSocketClient.GetChannel(
                     Convert.ToUInt64(Environment.GetEnvironmentVariable("CHANNEL_ID"))
                 );
-            
+
             if (channel != null) await channel.SendMessageAsync(embed: GetCovidEmbed(stats, infectedChartUrl));
         }
 
@@ -57,7 +51,7 @@ namespace MZCovidBot.Jobs
         {
             var embed = new EmbedBuilder
             {
-                Title = $"Covid statistics from {stats.TxtDate}",
+                Title = $"Daily covid statistics from {stats.TxtDate}",
                 Color = Color.Red,
                 Footer = new EmbedFooterBuilder()
                     .WithText($"Delivered at {DateTime.Now:HH:mm:ss MM/dd/yyyy}")
@@ -70,44 +64,5 @@ namespace MZCovidBot.Jobs
 
             return embed.Build();
         }
-
-        private static string GetChartUrl(List<CovidData> stats)
-        {
-            if (stats.Count == 1) return null;
-            var config = JsonConvert.SerializeObject(new ChartConfig
-            {
-                Type = "line",
-                Data = new ChartConfig.ChartData
-                {
-                    Labels = stats.Select(x => x.TxtDate).ToList(),
-                    DataSets = new List<ChartConfig.ChartData.DataSet>
-                    {
-                        new ChartConfig.ChartData.DataSet
-                        {
-                            Label = "Infected",
-                            Data = stats.Select(x => x.DailyInfected).ToList()
-                        }
-                    }
-                }
-            }, GetNewtonsoftJsonConfiguration());
-            
-            return new Chart
-            {
-                Height = 400,
-                Width = 800,
-                Config = config
-            }.GetUrl();
-        }
-        
-        private async Task SaveCovidData(LatestCovidStats stats)
-            => await _covidDataRepository.Create(_mapper.Map<CovidData>(stats));
-
-        private static JsonSerializerSettings GetNewtonsoftJsonConfiguration() => new JsonSerializerSettings
-        {
-            ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new CamelCaseNamingStrategy()
-            }
-        };
     }
 }

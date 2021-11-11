@@ -5,8 +5,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Flurl" Version="3.0.2" />
-        <PackageReference Include="Flurl.Http" Version="3.2.0" />
+        <PackageReference Include="Flurl" Version="3.0.2"/>
+        <PackageReference Include="Flurl.Http" Version="3.2.0"/>
+        <PackageReference Include="QuickChart" Version="2.2.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\MZCovidBot.Database\MZCovidBot.Database.csproj"/>
     </ItemGroup>
 
 </Project>
