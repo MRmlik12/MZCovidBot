@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace MZCovidBot.Stats.Api.Models
 {
@@ -10,6 +11,8 @@ namespace MZCovidBot.Stats.Api.Models
         public class ChartData
         {
             public List<string> Labels { get; set; }
+            
+            [JsonProperty("datasets")]
             public List<DataSet> DataSets { get; set; }
             
             public class DataSet

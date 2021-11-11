@@ -9,6 +9,8 @@ using MZCovidBot.Database.Interfaces;
 using MZCovidBot.Database.Models;
 using MZCovidBot.Stats.Api;
 using MZCovidBot.Stats.Api.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Quartz;
 using QuickChart;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
@@ -37,7 +39,7 @@ namespace MZCovidBot.Jobs
             var stats = await ApifyCovidApi.GetLatestCovidStats();
             var latestStat = await _covidDataRepository.GetLatest();
 
-            if (stats.LastUpdatedAtSource < latestStat?.LastUpdatedAtSource) return;
+            if (stats.LastUpdatedAtSource <= latestStat?.LastUpdatedAtSource) return;
 
             await SaveCovidData(stats);
             var latestStatsFromWeek = await _covidDataRepository.GetWeekData(DateTimeOffset.Now);
@@ -72,31 +74,40 @@ namespace MZCovidBot.Jobs
         private static string GetChartUrl(List<CovidData> stats)
         {
             if (stats.Count == 1) return null;
+            var config = JsonConvert.SerializeObject(new ChartConfig
+            {
+                Type = "line",
+                Data = new ChartConfig.ChartData
+                {
+                    Labels = stats.Select(x => x.TxtDate).ToList(),
+                    DataSets = new List<ChartConfig.ChartData.DataSet>
+                    {
+                        new ChartConfig.ChartData.DataSet
+                        {
+                            Label = "Infected",
+                            Data = stats.Select(x => x.DailyInfected).ToList()
+                        }
+                    }
+                }
+            }, GetNewtonsoftJsonConfiguration());
             
             return new Chart
             {
                 Height = 400,
                 Width = 800,
-                Config = JsonConvert.SerializeObject(new ChartConfig
-                {
-                    Type = "line",
-                    Data = new ChartConfig.ChartData
-                    {
-                        Labels = stats.Select(x => x.TxtDate).ToList(),
-                        DataSets = new List<ChartConfig.ChartData.DataSet>
-                        {
-                            new ChartConfig.ChartData.DataSet
-                            {
-                                Label = "Infected",
-                                Data = stats.Select(x => x.Infected).ToList()
-                            }
-                        }
-                    }
-                })
+                Config = config
             }.GetUrl();
         }
         
         private async Task SaveCovidData(LatestCovidStats stats)
             => await _covidDataRepository.Create(_mapper.Map<CovidData>(stats));
+
+        private static JsonSerializerSettings GetNewtonsoftJsonConfiguration() => new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            }
+        };
     }
 }
