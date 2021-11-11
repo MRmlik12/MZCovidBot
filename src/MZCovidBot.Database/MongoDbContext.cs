@@ -8,7 +8,7 @@ namespace MZCovidBot.Database
     {
         public MongoDbContext()
         {
-            var client = new MongoClient(Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING"));
+            var client = new MongoClient(Environment.GetEnvironmentVariable("MONGODB_CONNECTION_STRING"));
             var database = client.GetDatabase("MZCovidDB");
             CovidData = database.GetCollection<CovidData>("CovidData");
         }

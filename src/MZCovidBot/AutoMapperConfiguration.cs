@@ -8,7 +8,7 @@ namespace MZCovidBot
     {
         public static MapperConfiguration GetConfiguration()
         {
-            return new(cfg => { cfg.CreateMap<LatestCovidStats, CovidData>(); });
+            return new MapperConfiguration(cfg => { cfg.CreateMap<LatestCovidStats, CovidData>(); });
         }
     }
 }

@@ -31,20 +31,27 @@ namespace MZCovidBot.Jobs
         public async Task Execute(IJobExecutionContext context)
         {
             var stats = await ApifyCovidApi.GetLatestCovidStats();
+            var latestStat = await _covidDataRepository.GetLatest();
+
+            if (stats.LastUpdatedAtSource <= latestStat?.LastUpdatedAtSource) return;
+
             await _covidDataRepository.Create(_mapper.Map<CovidData>(stats));
+            var latestStatsFromWeek = await _covidDataRepository.GetWeekData(DateTimeOffset.Now);
+            var infectedChartUrl = GenerateChart.GetGeneratedChartUrl(latestStatsFromWeek);
+
             var channel =
                 (IMessageChannel)_discordSocketClient.GetChannel(
                     Convert.ToUInt64(Environment.GetEnvironmentVariable("CHANNEL_ID"))
                 );
 
-            if (channel != null) await channel.SendMessageAsync(embed: GetCovidEmbed(stats));
+            if (channel != null) await channel.SendMessageAsync(embed: GetCovidEmbed(stats, infectedChartUrl));
         }
 
-        private Embed GetCovidEmbed(LatestCovidStats stats)
+        private static Embed GetCovidEmbed(LatestCovidStats stats, string imageUrl)
         {
             var embed = new EmbedBuilder
             {
-                Title = $"Covid statistics from {stats.TxtDate}",
+                Title = $"Daily covid statistics from {stats.TxtDate}",
                 Color = Color.Red,
                 Footer = new EmbedFooterBuilder()
                     .WithText($"Delivered at {DateTime.Now:HH:mm:ss MM/dd/yyyy}")
@@ -52,7 +59,8 @@ namespace MZCovidBot.Jobs
 
             embed.AddField("Infected", stats.DailyInfected, true)
                 .AddField("Deceased", stats.DailyDeceased, true)
-                .AddField("Recovered", stats.DailyRecovered, true);
+                .AddField("Recovered", stats.DailyRecovered, true)
+                .WithImageUrl(imageUrl);
 
             return embed.Build();
         }
