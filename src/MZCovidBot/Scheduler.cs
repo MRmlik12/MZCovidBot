@@ -33,7 +33,7 @@ namespace MZCovidBot
                 .Build();
             var covidTrigger = TriggerBuilder.Create()
                 .WithIdentity("covid-trigger", "covid-group")
-                .StartAt(DateTimeOffset.Now.AddMinutes(5))
+                .StartAt(DateTimeOffset.Now)
                 .WithSimpleSchedule(x => x.WithIntervalInMinutes(30).RepeatForever())
                 .Build();
 
