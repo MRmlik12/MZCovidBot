@@ -44,10 +44,10 @@ namespace MZCovidBot.Jobs
                     Convert.ToUInt64(Environment.GetEnvironmentVariable("CHANNEL_ID"))
                 );
 
-            if (channel != null) await channel.SendMessageAsync(embed: GetCovidEmbed(stats, infectedChartUrl));
+            if (channel != null) await channel.SendMessageAsync(embed: GetCovidEmbed(stats, latestStat, infectedChartUrl));
         }
 
-        private static Embed GetCovidEmbed(LatestCovidStats stats, string imageUrl)
+        private static Embed GetCovidEmbed(LatestCovidStats stats, CovidData previousStats, string imageUrl)
         {
             var embed = new EmbedBuilder
             {
@@ -57,9 +57,9 @@ namespace MZCovidBot.Jobs
                     .WithText($"Delivered at {DateTime.Now:HH:mm:ss MM/dd/yyyy}")
             };
 
-            embed.AddField("Infected", stats.DailyInfected, true)
-                .AddField("Deceased", stats.DailyDeceased, true)
-                .AddField("Recovered", stats.DailyRecovered, true)
+            embed.AddField("Infected", $"{stats.DailyInfected} ({stats.DailyInfected - previousStats.DailyInfected})", true)
+                .AddField("Deceased", $"{stats.DailyDeceased} ({stats.DailyDeceased - previousStats.DailyDeceased})", true)
+                .AddField("Recovered", $"{stats.DailyRecovered} ({stats.DailyRecovered - previousStats.DailyRecovered})", true)
                 .WithImageUrl(imageUrl);
 
             return embed.Build();
