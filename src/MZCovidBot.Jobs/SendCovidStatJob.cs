@@ -35,8 +35,10 @@ namespace MZCovidBot.Jobs
 
             if (stats.LastUpdatedAtSource <= latestStat?.LastUpdatedAtSource) return;
 
-            await _covidDataRepository.Create(_mapper.Map<CovidData>(stats));
+            var mappedCovidData = _mapper.Map<CovidData>(stats);
             var latestStatsFromWeek = await _covidDataRepository.GetWeekData(DateTimeOffset.Now);
+            latestStatsFromWeek.Add(mappedCovidData);
+            await _covidDataRepository.Create(mappedCovidData);
             var infectedChartUrl = GenerateChart.GetGeneratedChartUrl(latestStatsFromWeek);
 
             var channel =
