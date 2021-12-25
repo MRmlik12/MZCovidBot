@@ -24,10 +24,8 @@ namespace MZCovidBot.Database.Repository
 
         public async Task<List<CovidData>> GetWeekData(DateTimeOffset date)
         {
-            var filter = Builders<CovidData>.Filter.Lte(x => x.LastUpdatedAtSource, date);
-
-            return await CovidData.Find(filter)
-                .Limit(7)
+            return await CovidData.Aggregate()
+                .Match(x => x.LastUpdatedAtSource >= date.AddDays(-7) && x.LastUpdatedAtSource < date)
                 .ToListAsync();
         }
 

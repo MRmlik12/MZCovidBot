@@ -45,7 +45,6 @@ namespace MZCovidBot.Jobs
                 (IMessageChannel)_discordSocketClient.GetChannel(
                     Convert.ToUInt64(Environment.GetEnvironmentVariable("CHANNEL_ID"))
                 );
-
             if (channel != null) await channel.SendMessageAsync(embed: GetCovidEmbed(stats, latestStat, infectedChartUrl));
         }
 
